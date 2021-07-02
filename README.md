@@ -1,5 +1,5 @@
 # sealR
- Repo for common functions from SEAL lab at NCSU
+R package for common R code from SEAL lab at NCSU
 
 ## Adding functions to this package
 This how-to comes from https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/
