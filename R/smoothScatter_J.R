@@ -1,19 +1,19 @@
-#' do smoothScatter with a linear equation legend
-#' Usage is the same with basic smoothScatter
-smoothScatter_J <- function(x, y, nbin = 300, nrpoints = 0, ...) {
-    require(RColorBrewer)
-    pal <- colorRampPalette(c("white", rev(brewer.pal(11, "Spectral"))))
-    smoothScatter(x, y, colramp = pal, nbin = nbin, nrpoints = nrpoints, transformation = function(x) x.^6, ...)
-    fit <- lm(y ~ x)
-    abline(fit, col = "red")
-    # === draw a 1:1 line ===
-    sim <- data.frame(matrix(c(1:10, 1:10), ncol = 2, byrow = FALSE))
-    names(sim) <- c("a", "b")
-    abline(lm(a ~ b, data = sim), col = "black", lty = 2)
-    cf <- round(coef(fit), 2)
-    eq <- paste("y=", ifelse(sign(cf[2]) == 1, "", "-"), abs(cf[2]), "x",
-                ifelse(sign(cf[1]) == 1, "+", "-"), abs(cf[1]), ", ", sep = "")
-    val <- round(summary(fit)$r.squared, 2)
-    legendLabel <- bquote(.(eq) ~ R ^ 2 == .(val))
-    legend("bottomright", legend = legendLabel)
+#' Plot stretched raster image with a nice color and legend
+#' @example PlotStretchLegend(r, viridis(200))
+PlotStretchLegend <- function(r, colorRamp, digits = 0, labSize = 1, ...) {
+    pal <- colorRampPalette(colorRamp)
+    qs <- quantile(r, c(0, 0.02, 0.98, 1))
+    r_breaks <- c(qs[1], seq(qs[2], qs[3], len = 255), qs[4])
+    plot(r, col = pal(length(r_breaks) - 1), breaks = r_breaks, axes = F, box = F, legend = F, ...)
+    # add a reasonable legend
+    legend_at <- round(seq(r_breaks[2], r_breaks[length(r_breaks) - 1], len = 7), digits)
+    legend_labels <- c(
+        paste("<", legend_at[1]),
+        as.character(legend_at[2:(length(legend_at) - 1)]),
+        paste(">", legend_at[length(legend_at)])
+    )
+    plot(raster(matrix(legend_at)),
+        legend.only = T, col = pal(length(r_breaks) - 1),
+        axis.args = list(at = legend_at, labels = legend_labels, cex.axis = labSize)
+    )
 }
