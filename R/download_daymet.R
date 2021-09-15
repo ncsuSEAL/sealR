@@ -29,7 +29,7 @@ out_dir <- "Z:/Gao/"
 
 
 # Actually, there are several download options provided in the "daymetr" package, here I only include a simpliest and commonly used one.
-download_daymet_ncss(location = c(north, west, south, east), start = startyr, end = endyr, param = var, frequency = "daily", path = out_dir)
+# download_daymet_ncss(location = c(north, west, south, east), start = startyr, end = endyr, param = var, frequency = "daily", path = out_dir)
 
 # Other download functions include: 
 # - download_daymet(): download single location daymet data.
@@ -40,6 +40,6 @@ download_daymet_ncss(location = c(north, west, south, east), start = startyr, en
 
 
 # They also provide a function to convert the downloaded daymet netCDF file to tiff format, although I don't recommend doing so.
-net2cdf(path = out_dir, files = "tmin_daily_1980_ncss.nc")
+# net2cdf(path = out_dir, files = "tmin_daily_1980_ncss.nc")
 
 
