@@ -2,7 +2,7 @@
 R package for common R code from SEAL lab at NCSU
 
 ## Adding functions to this package
-This how-to comes from https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/
+This how-to comes from https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/. Also see [this site](https://r-pkgs.org/description.html) for more in-depth information.
 
 ### Example
 Let's say you love dogs so much, you don't want just one picture of a dog at a time to cheer you up. You want 10 of them (or 100. or 1000). This is a real-world example.
