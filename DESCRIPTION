@@ -2,13 +2,26 @@ Package: sealR
 Title: A number of helpful functions for SEAL at NCSU
 Version: 1.0
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Ian",
+           family = "McGregor",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "imcgreg@ncsu.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person(given = "Xiaojie",
+           family = "Gao",
+           role = c("aut", "cre"),
+           email = "xgao26@ncsu.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: A number of helpful functions for SEAL at NCSU
-License: What license it uses
+Depends: 
+  R (>= 3.3.0)
+License: GPL-3
+Imports: 
+  utils (>= 4.0.0), 
+  daymetr (>= 1.0.0),
+  httr (>= 1.3.0),
+  XML (>= 3.5.0),
+  rgdal (>= 1.3.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
