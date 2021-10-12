@@ -24,7 +24,7 @@ Before you run the code:
 - *If you want to use existing shapefiles to clip your Planet imagery*: 
 - - Change the `shp_dir` to the path to your folder of shapefiles
 
-```
+```r
 library(sp)
 library(rgeos)
 library(rgdal)
@@ -42,7 +42,7 @@ orders_txt <- file.path(base_dir, "successful_orders.txt")
 
 ## Step 3: Generate geojsons of your area(s) of interest 
 Use the following code to generate geojsons of individual coordinates: 
-``` 
+``` r
 # Function to create shapefiles of a coordinate with the specified buffer
 # NOTE: This function generates warnings about the projection, but it creates the correct buffered coordinates
 coord_to_shp <- function(coordX, coordY, coord_name, coord_data = data.frame(), buffer_m = buffer, utm_zone = utm_zone, 
@@ -112,7 +112,7 @@ Alternatively, if you have shapefiles of polygons of interest:
 ## Step 4: Order your images 
 First, make sure you are in your activated conda environment, then initialize planet using `planet init` and sign in.
 
-```
+``` r
 # In your activated conda environment, first execute "planet init" in terminal 
 # Then, you will be prompted to log into your Planet account via your email and password.
 
@@ -170,7 +170,7 @@ lapply(all_geojsons, function(coord_file) {
 ```
 
 ## Step 5: Download the images
-```
+``` r
 # Wait for these orders to process 
 # To check on the progress, uncomment the line with the state of interest (queued, running, success, failed, partial) 
 # system(paste0("porder ostate --state queued --start ", date_ordered, " --end ", date_today))
