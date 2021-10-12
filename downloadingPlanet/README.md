@@ -200,4 +200,16 @@ for (url in urls_to_order) {
 }
 ```
 
+## Step 6: Extract the zip files
+``` r
+# Unzip the files and put into their own folders
+zips <- list.files("ps_images", pattern="*.zip")
+sapply(zips, function(Q){
+  # extract the name of the coordinate
+  id <- stringr::str_split(Q, "_[[:alnum:]]{4}")[[1]][1]
+  dirOut <- paste0("ps_images/", id) #create separate folder
+  unzip(paste0("ps_images/", Q), exdir=dirOut, overwrite=FALSE)
+})
+```
+
 View the [porder Github repository](https://github.com/tyson-swetnam/porder) for more information on how the CLI works! If you have any additional questions, reach out to Izzi with questions. 
