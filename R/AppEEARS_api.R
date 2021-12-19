@@ -1,6 +1,6 @@
 #************************************************************************
 # Description: Use AppEEARS API to submit point or area jobs
-# Author: Xiaojie Gao
+# Author: Xiaojie(J) Gao
 # Date: 2021-11-19
 #************************************************************************
 library(httr)
