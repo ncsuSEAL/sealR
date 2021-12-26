@@ -37,7 +37,7 @@ library(geojsonR)
 #' id <- c("0", "1") # ID for the point sites
 #' category <- c("Grand Canyon", "Zion") # Category for point sites
 #' 
-#' pts_df <- coordinates <- data.frame(id = id, longitude = lon, latitude = lat, category = category)
+#' pts_df <- data.frame(id = id, longitude = lon, latitude = lat, category = category)
 #' 
 #' layers <- data.frame(
 #'     product = c("CU_LE07.001", "CU_LC08.001"),
