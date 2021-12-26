@@ -171,7 +171,7 @@ SubmitTask <- function(token, task_name, task_type = "point",
     # Format Dates
     dates <- data.frame(startDate = start_date, endDate = end_date)
 
-    if (tolower(task_name) == "point") { # ~ Point tasks
+    if (tolower(task_type) == "point") { # ~ Point tasks
         task_info <- list(dates, layers, pts_df) # Create a list of data frames
         names(task_info) <- c("dates", "layers", "coordinates") # Assign names
 
