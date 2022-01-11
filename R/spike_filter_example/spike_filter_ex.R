@@ -36,13 +36,13 @@ par(xpd = FALSE) # enable objects to be drawn outside of plot regions?
 # 
 detect_outliers <- function(input, window, threshold, spike_amp,
                             timeframe) {
-    # data <- input[, mean(EVI2), date] # uncomment if want to find
+    # input <- input[, mean(EVI2), date] # uncomment if want to find
     #                                       the mean observation value
     #                                       by date
-    data <- input # Make copy of the input data to change
+    #input <- input # Make copy of the input data to change
     w_floor <- floor(window / 2) # number of obs to consider before/after
     #                              date of interest
-    n_obs <- nrow(data)
+    n_obs <- nrow(input)
     if (n_obs < window) {
         warning("Window size is larger than the number of dates
          with observations.")
@@ -51,12 +51,12 @@ detect_outliers <- function(input, window, threshold, spike_amp,
     input$spike <- 0 # all observations are spikeless (0) by default
     spike_dates <- c() # Create list to keep track of spike dates
     # Loop through moving windows
-    for (i in (w_floor + 1):(nrow(data) - w_floor)) {
+    for (i in (w_floor + 1):(nrow(input) - w_floor)) {
 
         # Determine observation of interest and window before/after
-        center <- data[i, ] # Center observation of interest
-        pre <- data[(i - w_floor):(i - 1), ] # Obs before date of interest
-        post <- data[(i + 1):(i + w_floor), ] # Obs after date of interest
+        center <- input[i, ] # Center observation of interest
+        pre <- input[(i - w_floor):(i - 1), ] # Obs before date of interest
+        post <- input[(i + 1):(i + w_floor), ] # Obs after date of interest
 
         # Calculate diffs between the median values before/after central obs
         pre_diff <- center$EVI2 - median(pre$EVI2)
@@ -72,7 +72,7 @@ detect_outliers <- function(input, window, threshold, spike_amp,
             if (((pre_diff <= - spike_amp) & (post_diff >= spike_amp)) |
             ((pre_diff >= spike_amp) & (post_diff <= - spike_amp))) {
                 # add this observation date to list of spike dates
-                spike_dates <- c(spike_dates, data[i, date])
+                spike_dates <- c(spike_dates, input[i, date])
             }
         }
     }
@@ -80,7 +80,7 @@ detect_outliers <- function(input, window, threshold, spike_amp,
     if (length(spike_dates >= 1)) {
         input[date %in% spike_dates, "spike"] <- 1 # spike found
     }
-    # Return the data with the added spike column, if any spikes detected
+    # Return the input data with the added spike column, if any spikes detected
     return(input)
 }
 
