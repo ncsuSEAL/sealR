@@ -3,6 +3,8 @@
 # Author: Xiaojie(J) Gao
 # Date: 2022-02-08
 #************************************************************************
+library(httr)
+
 
 
 #' Download MSLSP30NA tiles from the ftp server of LP DAAC.
