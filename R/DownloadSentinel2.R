@@ -56,11 +56,16 @@ DownloadSentinel2 <- function(tilename, folder, L2Flag = FALSE, regExp = NULL) {
     if (!is.null(regExp)) fileList <- grep(regExp, fileList, value = TRUE)
 
     # started downloading
+    message("Downloading...", length(fileList), " files")
+    pb <- txtProgressBar(min = 0, max = length(fileList), style = 3)
     for (i in 1:length(fileList)) {
         temp <- unlist(strsplit(fileList[i], "/"))
         dirname <- temp[length(temp)]
         if (dir.exists(file.path(destDir, tilename, dirname)) == FALSE) {
             system(paste("gsutil -m cp -r", fileList[i], file.path(destDir, tilename, ".")))
         }
+        setTxtProgressBar(pb, i) # update progress
     }
+    close(pb)
+    message("Done!")
 }
