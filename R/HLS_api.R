@@ -1,7 +1,7 @@
 #************************************************************************
 # Description: Working with HLS data API, including image query and download.
 #              Note the `.netrc` file login of earthdata doesn't work for me, so I figured an around way.
-#              Currently, the `DownloadQueriedHLS` function would download the whole HLS tile and if an roi 
+#              Currently, the `DownloadQueriedHLS` function would download the whole HLS tile and if an roi
 #              is provided, it would crop and overwrite the downloaded image file.
 # Author: Xiaojie(J) Gao
 # Date: 2021-12-19
@@ -14,28 +14,27 @@ library(httr)
 library(data.table)
 library(jsonlite)
 library(tools)
-library(rgdal)
 library(geojsonio)
 library(geojsonR)
 
 #' @examples
 #' \dontrun{
-#' 
+#'
 #' # read a study region
 #' roi_geojson <- readOGR("/Volumes/GoogleDrive/My Drive/Research/urban_pheno/Data/boston_bbox.geojson")
-#' # view the study region     
+#' # view the study region
 #' mapview::mapview(roi_geojson, col.regions = NA)
-#' 
+#'
 #' # search for images within a time period
 #' search_req <- QueryHLS(roi = extent(roi_geojson), start_date = "2021-08-01", end_date = "2021-08-15")
 #' # Format the query result as a data frame
 #' img_df <- FormatReq2DT(search_req)
 #' DT::datatable(img_df)
-#'      
+#'
 #' # Can take a look at the first requested image
 #' BriefView(search_req$features[1, ]$assets$browse$href)
-#'      
-#' 
+#'
+#'
 #' # Download images
 #' DownloadQueriedHLS(
 #'     img_urls = img_df$Asset_Link[1:3],
@@ -44,8 +43,8 @@ library(geojsonR)
 #'     password = "[Earthdata password]",
 #'     roi = roi_geojson,
 #'     crop = TRUE)
-#' 
-#' 
+#'
+#'
 #' }
 
 
@@ -53,12 +52,12 @@ search_URL <- 'https://cmr.earthdata.nasa.gov/stac/LPCLOUD/search'
 
 
 # start_date and end_date should be YYYY-MM-DD strings
-QueryHLS <- function(roi, pt = NULL, start_date, end_date, 
+QueryHLS <- function(roi, pt = NULL, start_date, end_date,
     prod = list("HLSS30.v2.0", "HLSL30.v2.0")) {
-    
+
     bbox_str <- paste(roi[1], roi[3], roi[2], roi[4], sep = ",")
     datetime <- paste0(start_date, "T00:00:00Z/", end_date, "T23:59:59Z")
-    
+
     # Submit a query
     search_body <- list(
         limit = 100,
@@ -76,10 +75,10 @@ QueryHLS <- function(roi, pt = NULL, start_date, end_date,
 
 
 # Format a search request to a data frame
-FormatReq2DT <- function(search_req, 
+FormatReq2DT <- function(search_req,
     s_bands = c("B8A", "B04", "Fmask"),
     l_bands = c("B05", "B04", "Fmask")) {
-    
+
     search_features <- search_req$features
     # A searchable data table
     granule_list <- list()
@@ -106,7 +105,7 @@ FormatReq2DT <- function(search_req,
         }
     }
     search_df <- do.call(rbind, granule_list)
-    
+
     return(search_df)
 }
 
@@ -170,7 +169,7 @@ DownloadQueriedHLS <- function(img_urls, out_dir, username, password, roi = NULL
         imgfiles <- list.files(out_dir, pattern = "*.tif$", full.names = TRUE)
 
         # make sure the spatial reference is consistent
-        
+
         r1 <- raster(imgfiles[1])
         if (!identical(crs(roi), crs(r1))) {
             roi <- spTransform(roi, crs(r1))
