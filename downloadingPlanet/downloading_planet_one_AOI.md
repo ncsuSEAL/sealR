@@ -89,7 +89,16 @@ $idlist_dir/split_IDs
 porder idsplit --idlist "$idlist_dir/AOI_IDs.csv" --lines 500 --local "$idlist_dir/idlists_split"
 ```
 
-## Step 5: Order the imagery with parameters of: 
+## Step 5: Order the imagery your specified parameters: 
+Here, I've asked it to: 
+1. Clip all of the tiles to the specified geojson polygon
+2. Zip all of the files in the order into one .zip file (makes the download MUCH faster)
+3. Calculate NDVI and EVI2 and have these as bands in the order. WARNING that if you specify these, you won't receive the actual RGB/NIR bands!
+
+See what other commands you can add [here](https://samapriya.github.io/projects/porder/#order)!
+
+The order matters when specifying these parameters, so be careful to specify your requested indices AFTER the "clip zipall", if you want them.
+
 ```{bash order}
 # Change directory to the idlists split to the identified max length
 cd "$idlist_dir/idlists_split"
