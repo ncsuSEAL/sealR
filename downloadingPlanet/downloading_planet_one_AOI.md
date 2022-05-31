@@ -15,12 +15,11 @@ DATA_DIR="$WORK_DIR/data"
 poly_shps="$DATA_DIR/field_shps" # Polygon shp path
 poly_geojsons="$DATA_DIR/field_geojsons" # Polygon geojson path
 aoi_geojson="$poly_geojsons/<name_of_your_geojson_file>.geojson"
-poly_IDs="$DATA_DIR/field_IDs" # IDs of PlanetScope images to order per polygon (not necessary if you have one AOI)
 idlist_dir="$DATA_DIR/hand_delineated_fields/idlists"
 
 # If you want PlanetScope data between two dates: 
-start_date=""
-end_date=""
+start_date="2021-01-01"
+end_date="2022-01-01"
 
 # Time frame in which you want to check for orders (e.g. if you ordered images on 2022-05-31, I'd use these)
 search_start="2022-05-30"
@@ -78,7 +77,7 @@ This will just return a one-column list of the PlanetScope images in a file: AOI
 # Use the idlist argument and input, start date, end date, item type, asset, and outfile parameters
 
 # If you have one geojson AOI: 
-porder idlist --input <full_path_to_geojson_file> --start "$start_date" --end "$end_date" --item "PSScene4Band" --asset "analytic_sr,udm" --outfile "$idlist_dir/AOI_IDs.csv"
+porder idlist --input "$aoi_geojson" --start "$start_date" --end "$end_date" --item "PSScene4Band" --asset "analytic_sr,udm" --outfile "$idlist_dir/AOI_IDs.csv"
 ```
 
 ## Step 4 (optional): Split the ID lists from Step 3 into smaller lists if need be (max of 500 IDs per order)
@@ -114,7 +113,7 @@ for ids in *; do porder order --name "${ids%.*}" --idlist "$idlist_dir/idlists_s
 ```{bash check_status}
 # State can be queued, running, success, failed, or partial
 # Start date and end date (format: YYYY-MM-DD) are dates to check for orders
-porder ostate --state "success" --start "$search_start" --end "search_end"
+porder ostate --state "success" --start "$search_start" --end "$search_end"
 ```
 
 ## Step 7: Download the successful orders of imagery!
