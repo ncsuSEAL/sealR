@@ -6,7 +6,7 @@ Step 1: Download conda via [Miniconda](https://docs.conda.io/en/latest/miniconda
 
 Step 2: Initialize conda in terminal using `conda init`.
 
-The primary steps below are for VS Code on a Mac. In June 2022, there were issues with the other versions of use below. Because we're not sure why this is happening (e.g. was this only for one specific computer?), we're documenting this here.
+The primary steps below are for VS Code. In June 2022, we discovered there are issues with trying to do this in Rstudio. Because we're not sure why this is happening (e.g. was this only for one specific computer? is it windows 11? Is it newer versions of Rstudio?), we're documenting this here.
 
 ## VS Code (both Mac and PC)
 1. Open the terminal in VS Code.
