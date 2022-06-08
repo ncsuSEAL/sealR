@@ -104,7 +104,7 @@ cd "$idlist_dir/idlists_split"
 
 # Order the images
 # Test this if you want to see the names of your Planet orders
-# for ids in *; do echo ${ids%.*}"; done
+# for ids in *; do echo "${ids%.*}"; done
 
 for ids in *; do porder order --name "${ids%.*}" --idlist "$idlist_dir/idlists_split/${ids}" --item "PSScene4Band" --bundle "analytic_sr_udm2,analytic_sr" --boundary "$aoi_geojson" --op clip zipall ndvi evi2; done
 ```
