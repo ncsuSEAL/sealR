@@ -102,7 +102,8 @@ FormatReq2DT <- function(search_req,
             df <- data.frame(
                 Collection = f$collection, # Make a data frame including links and other info
                 Granule_ID = f$id,
-                Cloud_Cover = f$properties$`eo:cloud_cover`,
+                # Somehow, cloud_cover is not available anymore
+                # Cloud_Cover = f$properties$`eo:cloud_cover`,
                 band = b,
                 Asset_Link = b_assets, stringsAsFactors = FALSE
             )
