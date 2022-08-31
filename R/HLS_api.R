@@ -3,6 +3,8 @@
 #              Note the `.netrc` file login of earthdata doesn't work for me, so I figured a way around.
 #              Currently, the `DownloadQueriedHLS` function would download the whole HLS tile and if an roi
 #              is provided, it would crop and overwrite the downloaded image file.
+#              Data downloading requires an EarthData account, you can register it 
+#              at this website: https://urs.earthdata.nasa.gov/users/new 
 # Author: Xiaojie(J) Gao
 # Date: 2021-12-19
 #************************************************************************
