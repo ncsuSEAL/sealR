@@ -1,6 +1,6 @@
 #************************************************************************
 # Description: Working with HLS data API, including image query and download.
-#              Note the `.netrc` file login of earthdata doesn't work for me, so I figured an around way.
+#              Note the `.netrc` file login of earthdata doesn't work for me, so I figured a way around.
 #              Currently, the `DownloadQueriedHLS` function would download the whole HLS tile and if an roi
 #              is provided, it would crop and overwrite the downloaded image file.
 # Author: Xiaojie(J) Gao
