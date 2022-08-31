@@ -28,7 +28,10 @@ library(geojsonR)
 #' # search for images within a time period
 #' search_req <- QueryHLS(roi = extent(roi_geojson), start_date = "2021-08-01", end_date = "2021-08-15")
 #' # Format the query result as a data frame
-#' img_df <- FormatReq2DT(search_req)
+#' img_df <- FormatReq2DT(search_req, 
+#'     s_bands = c("B8A", "B04", "Fmask"), 
+#'     l_bands = c("B05", "B04", "Fmask")
+#' )
 #' DT::datatable(img_df)
 #'
 #' # Can take a look at the first requested image
@@ -75,6 +78,7 @@ QueryHLS <- function(roi, pt = NULL, start_date, end_date,
 
 
 # Format a search request to a data frame
+# Make sure to specify the bands needed
 FormatReq2DT <- function(search_req,
     s_bands = c("B8A", "B04", "Fmask"),
     l_bands = c("B05", "B04", "Fmask")) {
