@@ -10,14 +10,14 @@
 #************************************************************************
 
 
-library(rgdal)
-library(raster)
-library(httr)
-library(data.table)
-library(jsonlite)
-library(tools)
-library(geojsonio)
-library(geojsonR)
+# library(rgdal)
+# library(raster)
+# library(httr)
+# library(data.table)
+# library(jsonlite)
+# library(tools)
+# library(geojsonio)
+# library(geojsonR)
 
 #' @examples
 #' \dontrun{
