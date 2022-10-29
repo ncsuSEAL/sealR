@@ -4,7 +4,7 @@
 #' Author: Xiaojie(J) Gao
 #' Date: 2022-09-22
 #'******************************************************************************
-library(curl)
+# library(curl)
 
 # From : https://data.tpdc.ac.cn/en/data/c6113f70-884a-4716-98e3-933421c57f25/?q=gimms
 # Ftp server: 210.72.14.198

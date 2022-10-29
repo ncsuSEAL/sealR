@@ -3,13 +3,13 @@
 # Author: Xiaojie Gao
 # Date: 2020-10-14
 #************************************************************************
-library(utils)
-library(httr)
-library(XML)
-library(raster)
-library(rgdal)
-library(tools)
-library(gdalUtils)
+# library(utils)
+# library(httr)
+# library(XML)
+# library(raster)
+# library(rgdal)
+# library(tools)
+# library(gdalUtils)
 
 
 #' Download the HLS v1.4 image product. 

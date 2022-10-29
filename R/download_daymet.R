@@ -5,7 +5,7 @@
 # Author: Xiaojie Gao
 # Date: 2020-11-26
 #************************************************************************
-library(daymetr)
+# library(daymetr)
 
 
 # user inputs
