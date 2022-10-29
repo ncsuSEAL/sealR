@@ -4,11 +4,11 @@
 #' (the "tiles" folder is L1C, otherwise all L2A is in the "L2" folder). 
 #' These images are the same as if you downloaded these from ESA Copernicus, but faster (i.e. you don't have to 
 #' request images and wait for them). Note that Google does not do their own L2A conversion - all L2A images
-#' are supplied directly from Copernicus (true as of April 2021).
+#' are supplied directly from Copernicus (true as of November 2022).
 #'
 #' Running this function requires Google Cloud Storage SDK, which you can download and install 
 #' from \href{https://cloud.google.com/sdk/docs/install}{here}. For your first time attempting to run the function
-#' you will need to open a python script and run `gcloud auth login`, which will take you to log in to your
+#' you will need to open a python or terminal script and run `gcloud auth login`, which will take you to log in to your
 #' google account.
 #'
 #' NOTE this function can NOT be run in RStudio because RStudio does not recognize `gsutil`. You need to use
