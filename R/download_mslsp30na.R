@@ -31,7 +31,7 @@ DownloadMSLSP30NA <- function(tiles, yrs, out_dir, username, password) {
     for (yr in yrs) {
         for (tile in tiles) {
             fname <- paste0("MSLSP_", tile, "_", yr, ".nc")
-            response <- GET(
+            response <- httr::GET(
                 paste0(handle, "/", yr, ".01.01", "/", fname),
                 write_disk(file.path(out_dir, fname), overwrite = TRUE),
                 authenticate(user = username, password = password),
