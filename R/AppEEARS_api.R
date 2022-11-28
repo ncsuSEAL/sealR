@@ -80,18 +80,20 @@
 #' }
 
 
-API_URL <- "https://lpdaacsvc.cr.usgs.gov/appeears/api/"
+API_URL <- "https://appeears.earthdatacloud.nasa.gov/api/"
 
 
 # List all available products
 # Return a list
 QueryALLProducts <- function() {
-    prods_req <- GET(paste0(API_URL, "product")) # Request the info of all products from product service
-    prods_content <- content(prods_req) # Retrieve the content of request
+    # Request the info of all products from product service
+    prods_req <- httr::GET(paste0(API_URL, "product")) 
+    # Retrieve the content of request
+    prods_content <- httr::content(prods_req) 
     
     # set names for each product 
-    all_prods <- toJSON(prods_content, auto_unbox = TRUE)
-    names(prods_content) <- fromJSON(all_prods)$ProductAndVersion
+    all_prods <- jsonlite::toJSON(prods_content, auto_unbox = TRUE)
+    names(prods_content) <- jsonlite::fromJSON(all_prods)$ProductAndVersion
     
     return(prods_content)
 }
@@ -107,18 +109,18 @@ QueryProducts <- function(filter = "") {
 
 # Query available layers in a product
 QueryLayers <- function(product_name) {
-    req <- GET(paste0(API_URL, "product/", product_name))
-    cont <- content(req)
+    req <- httr::GET(paste0(API_URL, "product/", product_name))
+    cont <- httr::content(req)
 
     return(cont)
 }
 
 # Query available projections
 QueryProjections <- function() {
-    req <- GET(paste0(API_URL, "spatial/proj"))
-    req_cont <- content(req)
+    req <- httr::GET(paste0(API_URL, "spatial/proj"))
+    req_cont <- httr::content(req)
 
-    projs <- fromJSON(toJSON(req_cont, auto_unbox = TRUE))
+    projs <- jsonlite::fromJSON(jsonlite::toJSON(req_cont, auto_unbox = TRUE))
     return(projs)
 }
 
@@ -128,15 +130,17 @@ Login <- function(usr, pwd) {
     # if username and password are not provided, input them in the ternimal window
     if(is.null(usr) | is.null(pwd)) {
         require(getPass)
-        message("username and password must be provided. You can create one on the EarthData website.")
-        usr <- getPass(msg = "Enter NASA Earthdata Login Username: ") # Enter NASA Earthdata Login Username
-        pwd <- getPass(msg = "Enter NASA Earthdata Login Password: ") # Enter NASA Earthdata Login Password
+        message("username and password must be provided. 
+            You can create one on the EarthData website."
+        )
+        usr <- getPass::getPass(msg = "Enter NASA Earthdata Login Username: ")
+        pwd <- getPass::getPass(msg = "Enter NASA Earthdata Login Password: ")
     }
     response <- httr::POST(
         paste0(API_URL, "login"),
-        authenticate(usr, pwd)
+        httr::authenticate(usr, pwd)
     )
-    response_content <- content(response)
+    response_content <- httr::content(response)
     token <- paste("Bearer", response_content$token)
     
     return(token)
@@ -144,16 +148,19 @@ Login <- function(usr, pwd) {
 
 # log out from AppEEARS
 Logout <- function(token) {
-    req <- POST(paste0(API_URL, "logout"), 
-        add_headers(Authorization = token)
+    req <- httr::POST(paste0(API_URL, "logout"), 
+        httr::add_headers(Authorization = token)
     )
 }
 
 # Submit a point task
 # task_name can either be 'point' or 'area', but relative params need to be provided
 SubmitTask <- function(token, task_name, task_type = "point", 
-    start_date = NULL, end_date = NULL, recursive = FALSE, from_year = NULL, to_year = NULL, 
-    layers = NULL, point_df = NULL, polygon_file = NULL, out_format = "geotiff", out_proj = NULL) {
+    start_date = NULL, end_date = NULL, recursive = FALSE, 
+    from_year = NULL, to_year = NULL, 
+    layers = NULL, point_df = NULL, polygon_file = NULL, 
+    out_format = "geotiff", out_proj = NULL
+) {
     
     # check arguments
     if (sum(is.null(start_date), is.null(end_date), is.null(layers)) > 0) {
@@ -178,25 +185,30 @@ SubmitTask <- function(token, task_name, task_type = "point",
         task <- list(task_info, task_name, task_type) # Create a nested list
         names(task) <- c("params", "task_name", "task_type") # Assign names
 
-        task_json <- toJSON(task, auto_unbox = TRUE) # Convert to JSON object
+        task_json <- jsonlite::toJSON(task, auto_unbox = TRUE) # Convert to JSON object
 
-        response <- POST(paste0(API_URL, "task"),
+        response <- httr::POST(paste0(API_URL, "task"),
             body = task_json,
             encode = "json",
-            add_headers(Authorization = token, "Content-Type" = "application/json")
+            httr::add_headers(Authorization = token, 
+                "Content-Type" = "application/json"
+            )
         )
 
-        task_content <- content(response) # Retrieve content of the request
-        task_response <- prettify(toJSON(task_content, auto_unbox = TRUE)) # Convert the content to JSON object
+        task_content <- httr::content(response) # Retrieve content of the request
+        task_response <- jsonlite::prettify(
+            jsonlite::toJSON(task_content, auto_unbox = TRUE)
+        ) # Convert the content to JSON object
         
         return(task_response)
 
     } else if (tolower(task_type) == "area") { # ~ Area tasks
         # read the polygon file
         if (file_ext(polygon_file) == "geojson") {
-            polygon_f <- readOGR(polygon_file)
+            polygon_f <- rgdal::readOGR(polygon_file)
         } else if (file_ext(polygon_file) == "shp") {
-            polygon_f <- readOGR(dsn = dirname(polygon_file), layer = file_path_sans_ext(basename(polygon_file)))
+            polygon_f <- rgdal::readOGR(dsn = dirname(polygon_file), 
+            layer = file_path_sans_ext(basename(polygon_file)))
         } else {
             stop("Please provide a valid shp or geojson file!")
         }
@@ -216,35 +228,37 @@ SubmitTask <- function(token, task_name, task_type = "point",
         names(task) <- c("params", "task_name", "task_type") # Assign names
         task_json <- jsonlite::toJSON(task, auto_unbox = TRUE, digits = 10)
 
-        response <- POST(paste0(API_URL, "task"),
+        response <- httr::POST(paste0(API_URL, "task"),
             body = task_json, encode = "json",
-            add_headers(Authorization = token, "Content-Type" = "application/json")
+            httr::add_headers(Authorization = token, 
+                "Content-Type" = "application/json"
+            )
         )
 
-        task_content <- content(response) # Retrieve content of the request
-        task_response <- jsonlite::toJSON(task_content, auto_unbox = TRUE) # Convert the content to JSON and prettify it
-        prettify(task_response)
+        task_content <- httr::content(response) # Retrieve content of the request
+        task_response <- jsonlite::toJSON(task_content, auto_unbox = TRUE)
+        jsonlite::prettify(task_response)
     }
 }
 
 # Check the status of current tasks
 CheckTaskStatus <- function(token, limit, task_name = NULL, brief = FALSE) {
     params <- list(limit = limit, pretty = TRUE)
-    response_req <- GET(paste0(API_URL, "task"), 
+    response_req <- httr::GET(paste0(API_URL, "task"), 
         query = params, 
-        add_headers(Authorization = token)
+        httr::add_headers(Authorization = token)
     )
-    response_content <- content(response_req) # Retrieve content of the request
-    status_response <- toJSON(response_content, auto_unbox = TRUE) # Convert the content to JSON object
-    response_df <- fromJSON(status_response)
+    response_content <- httr::content(response_req) # Retrieve content of the request
+    status_response <- jsonlite::toJSON(response_content, auto_unbox = TRUE)
+    response_df <- jsonlite::fromJSON(status_response)
     names(response_content) <- response_df$task_name
 
     if(is.null(task_name) == FALSE) {
         my_task <- response_content[grepl(task_name, response_content)]
-        my_task_json <- toJSON(my_task, auto_unbox = TRUE)
+        my_task_json <- jsonlite::toJSON(my_task, auto_unbox = TRUE)
 
         if (brief == TRUE) {
-            my_task_df <- fromJSON(my_task_json)[[task_name]]
+            my_task_df <- jsonlite::fromJSON(my_task_json)[[task_name]]
             my_task_df_b <- data.frame(
                 task_name = my_task_df$task_name, 
                 status = my_task_df$status, 
@@ -252,14 +266,14 @@ CheckTaskStatus <- function(token, limit, task_name = NULL, brief = FALSE) {
             )
             return(my_task_df_b)
         } else {
-           return(prettify(my_task_json))
+           return(jsonlite::prettify(my_task_json))
         }
     }
 
     if (brief == TRUE) {
         return(response_df[, c("task_name", "status", "task_id")])
     } else {
-       return(prettify(toJSON(response_content)))
+       return(jsonlite::prettify(jsonlite::toJSON(response_content)))
     }
 }
 
@@ -269,8 +283,12 @@ RefreshTaskStatus <- function(token, task_id, interval = 60) {
     stat <- ""
     while (stat != "done") {
         # Request the task status and retrieve content of request from task URL
-        stat_content <- content(GET(paste0(API_URL, "task/", task_id), add_headers(Authorization = token)))
-        stat <- fromJSON(toJSON(stat_content, auto_unbox = TRUE))$status # Get the status
+        stat_content <- httr::content(httr::GET(paste0(API_URL, "task/", task_id), 
+            httr::add_headers(Authorization = token))
+        )
+        stat <- jsonlite::fromJSON(
+            jsonlite::toJSON(stat_content, auto_unbox = TRUE)
+        )$status 
         print(stat)
 
         Sys.sleep(interval)
@@ -280,12 +298,14 @@ RefreshTaskStatus <- function(token, task_id, interval = 60) {
 # Download a task result
 DownloadTask <- function(token, task_id, out_dir) {
     # Request the task bundle info from API bundle URL
-    response <- GET(paste0(API_URL, "bundle/", task_id), add_headers(Authorization = token))
-    response_content <- content(response) # Retrieve content of the request
-    bundle_response <- toJSON(response_content, auto_unbox = TRUE) # Convert the content to JSON object
-    prettify(bundle_response)
+    response <- httr::GET(paste0(API_URL, "bundle/", task_id), 
+        httr::add_headers(Authorization = token)
+    )
+    response_content <- httr::content(response) # Retrieve content of the request
+    bundle_response <- jsonlite::toJSON(response_content, auto_unbox = TRUE) 
+    jsonlite::prettify(bundle_response)
 
-    bundle <- fromJSON(bundle_response)$files
+    bundle <- jsonlite::fromJSON(bundle_response)$files
     for (id in bundle$file_id) {
         # retrieve the filename from the file_id
         filename <- bundle[bundle$file_id == id, ]$file_name
@@ -293,11 +313,11 @@ DownloadTask <- function(token, task_id, out_dir) {
         filepath <- paste(out_dir, filename, sep = "/")
         suppressWarnings(dir.create(dirname(filepath)))
         # write the file to disk using the destination directory and file name
-        response <- GET(
+        response <- httr::GET(
             paste0(API_URL, "bundle/", task_id, "/", id),
             write_disk(filepath, overwrite = TRUE),
             progress(),
-            add_headers(Authorization = token)
+            httr::add_headers(Authorization = token)
         )
     }
 }
