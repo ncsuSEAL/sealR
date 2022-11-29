@@ -204,11 +204,11 @@ SubmitTask <- function(token, task_name, task_type = "point",
 
     } else if (tolower(task_type) == "area") { # ~ Area tasks
         # read the polygon file
-        if (file_ext(polygon_file) == "geojson") {
+        if (tools::file_ext(polygon_file) == "geojson") {
             polygon_f <- rgdal::readOGR(polygon_file)
-        } else if (file_ext(polygon_file) == "shp") {
+        } else if (tools::file_ext(polygon_file) == "shp") {
             polygon_f <- rgdal::readOGR(dsn = dirname(polygon_file), 
-            layer = file_path_sans_ext(basename(polygon_file)))
+            layer = tools::file_path_sans_ext(basename(polygon_file)))
         } else {
             stop("Please provide a valid shp or geojson file!")
         }
