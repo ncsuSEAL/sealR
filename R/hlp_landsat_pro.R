@@ -1,6 +1,12 @@
 # ******************************************************************************
 # Basic image processing functions
 # 
+# Usage example: 
+#     roifile <- "roi.shp"
+#     study_period <- "1984-01-01/2022-12-31"
+#     landsat_data_dir <- "Jobs/LandsatEVI2/"
+#     LandsatPro$DownloadEVI2(roifile, study_period, landsat_data_dir)
+#
 # Author: Xiaojie Gao
 # Date: 2023-07-03
 # ******************************************************************************
