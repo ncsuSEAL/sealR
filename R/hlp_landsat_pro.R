@@ -175,7 +175,7 @@ LandsatPro <- list(
         # Request image urls
         null <- lapply(start_end_dates, function(focal_dates) {
             # Search some data
-            obj <- stac_search(s_obj,
+            obj <- stac_search(LandsatPro$s_obj,
                 collections = "landsat-c2-l2",
                 ids = NULL, # could specify this if wanted
                 bbox = roi_ext[c(1, 3, 2, 4)],
