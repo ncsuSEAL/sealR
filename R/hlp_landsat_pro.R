@@ -5,7 +5,9 @@
 #     roifile <- "roi.shp"
 #     study_period <- "1984-01-01/2022-12-31"
 #     landsat_data_dir <- "Jobs/LandsatEVI2/"
-#     LandsatPro$DownloadEVI2(roifile, study_period, landsat_data_dir)
+#     LandsatPro$Download(roifile, study_period, landsat_data_dir, 
+#         evi2_only = FALSE, crop = TRUE
+#     )
 #
 # Author: Xiaojie Gao
 # Date: 2023-07-03
@@ -107,7 +109,7 @@ LandsatPro <- list(
     #' @param out_file Output file path.
     #'
     #' @return NULL.
-    DoSingleEVI2 = function(roi_ext, fea, out_file) {
+    DoSingleEVI2 = function(roi_ext, fea, out_file, crop = TRUE) {
         date <- as.Date(gsub("T.*", "", fea$properties$datetime))
         epsg <- fea$properties$`proj:epsg`
 
@@ -126,19 +128,26 @@ LandsatPro <- list(
         tryCatch({
             # Red
             red_band <- paste0("/vsicurl/", fea$assets$red$href) %>%
-                terra::rast() %>%
-                crop(roi)
+                terra::rast()
+            if (crop == TRUE) {
+                red_band <- crop(red_band, roi)
+            }
+
             # Nir
             nir_band <- paste0("/vsicurl/", fea$assets$nir08$href) %>%
-                terra::rast() %>%
-                crop(roi)
+                terra::rast()
+            if (crop == TRUE) {
+                nir_band <- crop(nir_band, roi)
+            }
 
             evi2_img <- LandsatPro$CalEVI2(nir_band, red_band)
 
             # QA
             qa_band <- paste0("/vsicurl/", fea$assets$qa_pixel$href) %>%
-                terra::rast() %>%
-                crop(roi)
+                terra::rast()
+            if (crop == TRUE) {
+                qa_band <- crop(qa_band, roi)
+            }
 
             qa_parse <- LandsatPro$CloudSnowQA(values(qa_band))
 
@@ -159,11 +168,88 @@ LandsatPro <- list(
         })
     },
 
-    #' Download raw Landsat image time series for a given region using MPC
+    #' Do a single image
     #' 
+    #' @param roi_ext Study region extent.
+    #' @param fea The STAC feature
     #' @param out_dir Output directory.
+    #'
+    #' 
+    #' @return NULL
+    DoSingleImg = function(roi_ext, fea, out_dir, crop = TRUE) {
+        date <- as.Date(gsub("T.*", "", fea$properties$datetime))
+        epsg <- fea$properties$`proj:epsg`
+
+        # Project the point buffer to the epsg
+        # Have to create the points again as terra doesn't serielize spatial
+        #   objects.
+        ext_coords <- rbind(
+            cbind(roi_ext[1], roi_ext[3]),
+            cbind(roi_ext[1], roi_ext[4]),
+            cbind(roi_ext[2], roi_ext[4]),
+            cbind(roi_ext[2], roi_ext[3])
+        )
+        roi <- vect(ext_coords, type = "polygons", crs = "EPSG:4326") %>%
+            terra::project(paste0("EPSG:", epsg))
+
+        tryCatch(
+            {
+                # Create a folder to store all files
+                destdir <- file.path(out_dir, fea$id)
+                if (!dir.exists(destdir)) {
+                    dir.create(destdir)
+                }
+
+                null <- lapply(fea$assets, function(b) {
+                    # Download metadata
+                    if (grepl("image/tiff", b$type) == FALSE) {
+                        filename <- file.path(
+                            destdir, 
+                            strsplit(basename(b$href), "\\?")[[1]][1]
+                        )
+                        # Skip the MTL.json file
+                        if (grepl("MTL.json", basename(filename)) == TRUE) {
+                            return(NULL)
+                        }
+                        download.file(b$href, filename, quiet = TRUE)
+                        return(NULL)
+                    }
+                    
+                    # Download and/or crop all image bands
+                    bb <- paste0("/vsicurl/", b$href) %>%
+                        terra::rast()
+                    if (crop == TRUE) {
+                        bb <- crop(bb, roi)
+                    }
+                    filename <- file.path(destdir, paste0(names(bb), ".tiff"))
+                    if (file.exists(filename) == FALSE) {
+                        writeRaster(bb, filename)
+                    }
+                    return(NULL)
+                })
+            },
+            error = function(e) {
+                message(paste(fea$id, "failed!"))
+            }
+        )
+    },
+
+    #' Download Landsat image time series for a given region using MPC
+    #' 
+    #' @description
+    #' 
+    #' @param roifile
+    #' @param study_period
+    #' @param out_dir Output directory.
+    #' @param evi2_only Logical, indicates whether download EVI2 images only.
     #' @param crop Logical, indicates whether images should be cropped by roi.
-    DownloadEVI2 = function(roifile, study_period, out_dir, crop = TRUE) {
+    #'
+    #' @return NULL
+    #'
+    #' @export
+    Download = function(roifile, study_period, out_dir, 
+        evi2_only = FALSE, crop = TRUE
+    ) {
         # Split the entire time period
         start_end_dates <- LandsatPro$SplitStudyPeriod(study_period)
 
@@ -185,9 +271,10 @@ LandsatPro <- list(
                 get_request() %>%
                 items_sign(sign_fn = sign_planetary_computer()) %>%
                 suppressWarnings()
-            
+
             # Process and export
-            print(paste("Processing", focal_dates, "...", 
+            print(paste(
+                "Processing", focal_dates, "...",
                 "total:", length(obj$features)
             ))
             if (length(obj$features) == 0) {
@@ -199,9 +286,13 @@ LandsatPro <- list(
             null <- lapply(1:length(obj$features), function(i) {
                 fea <- obj$features[[i]]
 
-                out_file <- file.path(out_dir, paste0(fea$id, "_evi2.tiff"))
-                if (!file.exists(out_file)) {
-                    LandsatPro$DoSingleEVI2(roi_ext, fea, out_file)
+                if (evi2_only == TRUE) {
+                    out_file <- file.path(out_dir, paste0(fea$id, "_evi2.tiff"))
+                    if (!file.exists(out_file)) {
+                        LandsatPro$DoSingleEVI2(roi_ext, fea, out_file, crop)
+                    }
+                } else {
+                        LandsatPro$DoSingleImg(roi_ext, fea, out_dir, crop)
                 }
 
                 # update progress
